@@ -4,7 +4,9 @@
 """
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
-
+import pandas as pd
+import os
+import zipfile
 
 def pregunta_01():
     """
@@ -71,3 +73,56 @@ def pregunta_01():
 
 
     """
+    def procesamiento_carpeta_ruta(ruta_base):
+
+        datos = []
+
+        for elemento in ["negative", "neutral", "positive"]:
+
+            carpeta = os.path.join(ruta_base, elemento)
+
+            if os.path.exists(carpeta):
+
+                for archivo in os.listdir(carpeta):
+
+                    if archivo.endswith(".txt"):
+
+                        ruta_archivo = os.path.join(
+                            carpeta,
+                            archivo,
+                        )
+
+                        with open(
+                            ruta_archivo,
+                            "r",
+                            encoding="utf-8",
+                        ) as file:
+
+                            frase = file.read().strip()
+
+                        datos.append(
+                            {
+                                "phrase": frase,
+                                "target": elemento,
+                            }
+                        )
+
+        return pd.DataFrame(datos)
+
+
+    train_dataset = procesamiento_carpeta_ruta("input/train")
+    test_dataset = procesamiento_carpeta_ruta("input/test")
+
+
+    os.makedirs("files/output", exist_ok=True)
+
+
+    train_dataset.to_csv(
+        "files/output/train_dataset.csv",
+        index=False,
+    )
+
+    test_dataset.to_csv(
+        "files/output/test_dataset.csv",
+        index=False,
+    )
